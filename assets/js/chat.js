@@ -52,33 +52,46 @@ $(document).ready(function() {
         console.log(response);
         var data = response.data;
 
-        if (data.messages && data.messages.length > 0) {
-          console.log('received ' + data.messages.length + ' messages');
+        // console.log('received response length', data.messages.length);
+
+        if (data.messages && typeof data.messages === 'object') {
+          // console.log('received ' + data.messages.length + ' messages');
 
           var messages = data.messages;
 
-          for (var message of messages) {
-            if (message.type === 'unstructured') {
-              insertResponseMessage(message.unstructured.text);
-            } else if (message.type === 'structured' && message.structured.type === 'product') {
-              var html = '';
+          console.log("data messages", messages);
 
-              insertResponseMessage(message.structured.text);
-
-              setTimeout(function() {
-                html = '<img src="' + message.structured.payload.imageUrl + '" witdth="200" height="240" class="thumbnail" /><b>' +
-                  message.structured.payload.name + '<br>$' +
-                  message.structured.payload.price +
-                  '</b><br><a href="#" onclick="' + message.structured.payload.clickAction + '()">' +
-                  message.structured.payload.buttonLabel + '</a>';
-                insertResponseMessage(html);
-              }, 1100);
-            } else {
-              console.log('not implemented');
+          for (var message of messages)
+          {
+              console.log(message);
+              if (message.contentType === 'PlainText') 
+              {
+                insertResponseMessage(message.content);
+              } 
+              else if (message.type === 'structured' && message.structured.type === 'product') 
+              {
+                var html = '';
+        
+                insertResponseMessage(message.structured.text);
+        
+                setTimeout(function() {
+                  html = '<img src="' + message.structured.payload.imageUrl + '" width="200" height="240" class="thumbnail" /><b>' +
+                    message.structured.payload.name + '<br>$' +
+                    message.structured.payload.price +
+                    '</b><br><a href="#" onclick="' + message.structured.payload.clickAction + '()">' +
+                    message.structured.payload.buttonLabel + '</a>';
+                  insertResponseMessage(html);
+                }, 1100);
+              } 
+              else 
+              {
+                console.log('not implemented');
+              }
             }
-          }
-        } else {
-          insertResponseMessage('Oops, something went wrong. Please try again.');
+          // }
+        }
+        else {
+          insertResponseMessage('message Oops, something went wrong. Please try again.');
         }
       })
       .catch((error) => {
