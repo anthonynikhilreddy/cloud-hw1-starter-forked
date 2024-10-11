@@ -25,6 +25,12 @@ $(document).ready(function() {
     }
   }
 
+  var sessionId = sessionStorage.getItem('sessionId');
+  if (!sessionId) {
+    sessionId = uuidv4();
+    sessionStorage.setItem('sessionId', sessionId);
+  }
+
   function callChatbotApi(message) {
     // params, body, additionalParams
     return sdk.chatbotPost({}, {
@@ -33,7 +39,8 @@ $(document).ready(function() {
         unstructured: {
           text: message
         }
-      }]
+      }],
+      sessionId: sessionId
     }, {});
   }
 
@@ -49,7 +56,7 @@ $(document).ready(function() {
 
     callChatbotApi(msg)
       .then((response) => {
-        console.log(response);
+        console.log("callChatbotApi", response);
         var data = response.data;
 
         // console.log('received response length', data.messages.length);
@@ -110,6 +117,15 @@ $(document).ready(function() {
       return false;
     }
   })
+
+  // Helper function to generate UUID
+  function uuidv4() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random() * 16 | 0,
+        v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
 
   function insertResponseMessage(content) {
     $('<div class="message loading new"><figure class="avatar"><img src="https://media.tenor.com/images/4c347ea7198af12fd0a66790515f958f/tenor.gif" /></figure><span></span></div>').appendTo($('.mCSB_container'));
